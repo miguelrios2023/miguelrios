@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Variables
+INSTANCE_TYPE="t2.micro"
+AMI_ID="LAB_6"  # ID de la AMI que deseas utilizar
+KEY_PAIR_NAME="KEY_SECRET_LAB6"  # Nombre del par de claves que creaste previamente
+SECURITY_GROUP_NAME="MySecurityGroup"  # Nombre del grupo de seguridad para la instancia
+INSTANCE_NAME="MyEC2Instance"  # Nombre que deseas asignar a la instancia
+
+# Crear el grupo de seguridad
+aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "Security group for my EC2 instance"
+aws ec2 authorize-security-group-ingress --group-name $SECURITY_GROUP_NAME --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+# Obtener el ID del grupo de seguridad
+SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --group-names $SECURITY_GROUP_NAME --query 'SecurityGroups[0].GroupId' --output text)
+
+# Crear la instancia
+INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $SECURITY_GROUP_ID --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]" --query 'Instances[0].InstanceId' --output text)
+
+# Esperar hasta que la instancia esté en estado 'running'
+aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+
+# Obtener la dirección IP pública de la instancia
+PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+
+echo "La instancia se ha creado con éxito. IP pública: $PUBLIC_IP"
