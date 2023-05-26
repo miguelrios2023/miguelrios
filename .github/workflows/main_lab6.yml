@@ -1,0 +1,31 @@
+name: Provision Terra-lab6
+
+on:
+  push:
+    branches:
+      - main  # Cambia "main" por la rama en la que deseas activar el flujo de trabajo
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: <tu-región-de-AWS>  # Reemplaza <tu-región-de-AWS> con tu región de AWS
+
+      - name: Provision EC2 instance
+        run: |
+          # Coloca aquí los comandos para aprovisionar tu instancia EC2 en AWS
+          # Puedes utilizar la CLI de AWS o cualquier otra herramienta que necesites
+
+      - name: Show instance details
+        run: |
+          # Coloca aquí los comandos para mostrar los detalles de la instancia creada
+          # Puedes utilizar la CLI de AWS u otras herramientas para obtener información de la instancia
